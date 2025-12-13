@@ -42,9 +42,12 @@ def fun_get_files(packages:list)->list:
 			if not len(f_ok)==2:
 				continue
 
-			found=f_ok[1]
+			found=fix_str(f_ok[1])
 
 		if found is None:
+			continue
+
+		if not Path(found).is_file():
 			continue
 
 		list_ok.append(found)
