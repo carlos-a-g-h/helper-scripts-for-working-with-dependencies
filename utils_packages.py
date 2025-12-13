@@ -2,9 +2,57 @@
 
 from pathlib import Path
 from typing import Optional
-from utils_Any import cmd
+from utils_Any import cmd,fix_str
 
 _SYM_SEP=":"
+
+def fun_get_files(packages:list)->list:
+
+	command=["dpkg","-S"]
+	command.extend(packages)
+
+	result=cmd(command)
+	ec,out,err=result
+	if not ec==0:
+		print(err)
+		return []
+
+	out_ok=fix_str(out)
+	if out_ok is None:
+		return []
+
+	lines=out_ok.splitlines()
+
+	list_ok=[]
+	total=len(lines)
+	while True:
+		total=total-1
+		if total<0:
+			break
+		f=lines.pop()
+
+		found=None
+		for pkg in packages:
+			patt=f"{pkg}:"
+			if not f.startswith(patt):
+				continue
+
+			f_ok=f.split(" ")
+			print(f_ok)
+			if not len(f_ok)==2:
+				continue
+
+			found=f_ok[1]
+
+		if found is None:
+			continue
+
+		list_ok.append(found)
+
+	print(len(lines))
+
+	return list_ok
+
 
 def fun_get_package(
 		path_file_str:str,
